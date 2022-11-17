@@ -11,6 +11,7 @@ def triangulate(level):
 
     x = np.linspace(0,2,N+1)
     y = np.linspace(0,2,N+1)
+
     nodes = []
     for i in x:
         for j in y:
@@ -42,8 +43,6 @@ def triangulate(level):
         else:
             interior.append((x, y))
         
-    
-
     return nodes, element, interior
 
 def plot(nodes, element, interior):
