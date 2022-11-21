@@ -1,4 +1,4 @@
-# Solution to Exercise 5.3 of the course
+# Solution to Exercise 5.4 b) of the course
 # Uncertainty Quantification and Quasi-Monte Carlo
 # by Christoph Jankowsky
 
