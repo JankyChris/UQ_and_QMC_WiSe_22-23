@@ -4,6 +4,7 @@
 import numpy as np
 import scipy.io
 from scipy import sparse
+from scipy.sparse.linalg import eigsh
 
 def FEMdata():
     """
@@ -24,22 +25,14 @@ def FEMdata():
 
     return grad, mass, nodes, element, interior, centers, ncoord, nelem
 
-f = lambda x: x[0]
-
-def a(x, y):
+def a(centers, y):
     """
     Definition of the diffusion coefficient.
     """
 
-    def psi(k, x):
-        """
-        Stochastic fluctuations.
-        """
-        x1 = x[0]
-        x2 = x[1]
-
-        return k**(-2) * np.sin(pi*k*x1) * np.sin(pi*k*x2)
+    return k**(-2) * np.sin(np.pi*k*centers[:,0]) * np.sin(np.pi*k*centers[:,1])
     
+    """
     kmax = len(y)
     val = []
 
@@ -47,12 +40,41 @@ def a(x, y):
         val.append(y[k] * psi(k, x))
 
     return 2 + np.sum(val)
+    """
 
 def UpdateStiffness(grad, a):
     n = np.sqrt(grad.shape[0]).astype(int)
     return (grad@sparse.csr_matrix(a.reshape((a.size,1)))).reshape((n,n))
 
+def MonteCarlo(y, x, u, n, s=100):
+    us = [u(x, yi) for yi in y]
+    
+    return (1/n * np.sum(us))
+
 if __name__ == "__main__":
+    # use n == 2^maxiter as the "reference solution"
+    maxiter = 20;
+
+    # load FEM data from MATLAB file
     grad, mass, nodes, element, interior, centers, ncoord, nelem = FEMdata()
-    a = ...
-    stiff = UpdateStiffness(grad, a)
+
+    # define source term ( f(x)=x_1 )
+    f = lambda x: x[0]
+    # define loading vector
+    rhs = mass[interior, :] * f(nodes)
+
+    sums = []
+    means = []
+    null = np.zeros(ncoord, 1)
+
+    # range over an increasing number of random samples
+    for i in range(maxiter):
+        print("Iteration: ", i)
+        n = max(1, 2**(i-1))
+        tmp = np.zeros(ncoord, 1)
+        # main loop
+        for k in range(1, n+1):
+            mcnode = np.random.uniform(low=-0.5, high=0.5, size=(n,s))
+            A = UpdateStiffness(grad, a(centers, mcnode))
+            sol = null
+            sol[interior] = np.linalg.solve(A[interior, interior], rhs)
