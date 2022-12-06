@@ -59,9 +59,9 @@ if __name__ == "__main__":
     grad, mass, nodes, element, interior, centers, ncoord, nelem = FEMdata()
 
     # define source term ( f(x)=x_1 )
-    f = lambda x: x[0]
+    f = lambda x: x[:, 0]
     # define loading vector
-    rhs = mass[interior, :] * f(nodes)
+    rhs = mass[interior, :] @ f(nodes)
 
     sums = []
     means = []
