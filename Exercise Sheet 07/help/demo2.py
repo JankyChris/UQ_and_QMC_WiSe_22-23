@@ -16,7 +16,7 @@ def UpdateStiffness(grad,a):
 
 if __name__ == '__main__':
     # Import FEM data
-    mat = scipy.io.loadmat('week7.mat')
+    mat = scipy.io.loadmat('Exercise Sheet 07/week7.mat')
     grad = mat['grad']
     mass = mat['mass']
     nodes = mat['nodes']
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     for i in [0,59,1023]:
         fig = plt.figure(figsize=plt.figaspect(1.0))
         ax = fig.add_subplot(1,1,1,projection='3d')
-        ax.plot_trisurf(nodes[:,0],nodes[:,1],results[i],triangles=element,cmap=plt.cm.rainbow)
+        ax.plot_trisurf(nodes[:,0],nodes[:,1],results[i],triangles=element,cmap="viridis")
         plt.show()
 
     ## Part 2: Eigenvalue problem
@@ -82,5 +82,5 @@ if __name__ == '__main__':
         print(str(i+1) + 'th eigenvalue: ' + str(results[i][0]))
         fig = plt.figure(figsize=plt.figaspect(1.0))
         ax = fig.add_subplot(1,1,1,projection='3d')
-        ax.plot_trisurf(nodes[:,0],nodes[:,1],results[i][1],triangles=element,cmap=plt.cm.rainbow)
+        ax.plot_trisurf(nodes[:,0],nodes[:,1],results[i][1],triangles=element,cmap="viridis")
         plt.show()
