@@ -1,6 +1,6 @@
 # Written by Christoph Jankowsky - 2022
 # Exercise 7 of the course Uncertainty Quantification and Quasi-Monte Carlo
-# using a classic Monte Carlo method
+# Solving a source PDE using MC and QMC methods
 
 import numpy as np
 import scipy.io
@@ -46,11 +46,11 @@ def UpdateStiffness(grad, a):
 
     return sparse.csr_matrix.reshape(vec,(n,n)).tocsr()
 
-def mse(A, B):
+def rmse(A, B):
     """
     Returns the mean-squared (L2) error of two arrays A and B
     """
-    return ((A-B)**2).mean()
+    return np.sqrt(((A-B)**2).mean())
 
 def plotPDE(nodes, element, result):
     """
@@ -61,17 +61,19 @@ def plotPDE(nodes, element, result):
     ax.plot_trisurf(nodes[:, 0], nodes[:, 1], result, triangles=element, cmap="viridis")
     plt.show()
 
-def plotERROR(reference, approximations, n):
+def plotERROR(reference, approximations, maxiter: int):
     """
     Plots the log-log error graph between the reference solution and the array of approximations
     """
-    ns = np.asarray([i for i in range(int(n/(2**3)))])
-    errors = [mse(reference, approximation) for approximation in approximations]
+    ns = np.asarray([2**i for i in range(1, maxiter-5)])
+    errors = [rmse(reference, approximation) for approximation in approximations]
     fig = plt.figure(figsize=plt.figaspect(1.0))
     ax = fig.add_subplot(1,1,1)
-    ax.loglog(ns, errors, label=...)
+    slope, intercept = np.polyfit(np.log10(ns), np.log10(errors), 1)
+    ax.loglog(ns, errors, label="Errors")
+    ax.loglog(ns, 10**intercept * (ns)**slope, label=f"Slope = {slope:.2f}")
     plt.legend()
-    plt.show()
+    # plt.show()
 
 if __name__ == "__main__":
     # use n == 2^maxiter as the "reference solution"
@@ -108,30 +110,35 @@ if __name__ == "__main__":
     """
 
     n_cpu = 16
-
+    
     def solveMC(i):
         mcnode = np.random.uniform(-1/2,1/2,s)
-        A = UpdateStiffness(grad,a(centers, mcnode, s))
+        A = UpdateStiffness(grad, a(centers, mcnode, s))
         sol = np.zeros(ncoord)
-        tmp = spsolve(A[np.ix_(interior,interior)], rhs)
+        tmp = spsolve(A[np.ix_(interior, interior)], rhs)
         sol[interior] = tmp
         return sol
 
-    print(f"Solve {n:,} PDE source problems in parallel with {n_cpu} workers using Monte Carlo nodes...")
+    print(f"Solve {n:,} PDE source problems in parallel with {n_cpu} workers using \033[1mMonte Carlo\033[0m nodes...")
     start = perf_counter()
     resultsMC = np.asarray(Parallel(n_jobs=n_cpu, verbose=0)(delayed(solveMC)(i) for i in range(n)))
     stop = perf_counter()
-    print(f"Solving took {stop-start:.2f} seconds.")
+    if stop-start > 60:
+        print(f"Solving took {(stop-start)/60:.2f} minutes.")
+    else:
+        print(f"Solving took {stop-start:.2f} seconds.")
 
     referenceMC = resultsMC.mean(axis=0)
 
     # Visualize the results
-    #plotPDE(nodes, element, reference)
-    approximationMC = [resultsMC[:i+1].mean(axis=0) for i in range(int(n/(2**3)))]
+    # plotPDE(nodes, element, referenceMC)
+    approximationMC = [resultsMC[:2**i].mean(axis=0) for i in range(1, maxiter-5)]
 
+    plotERROR(referenceMC, approximationMC, maxiter)
+    
     ## Source Problem using Quasi-Monte Carlo method
 
-    z = np.loadtxt('Exercise Sheet 07/offtheshelf.txt') # Generating vector
+    z = np.loadtxt("Exercise Sheet 07/offtheshelf.txt") # Generating vector
 
     def solveQMC(i):
         qmcnode = np.mod(i*z/n,1)-1/2
@@ -141,18 +148,21 @@ if __name__ == "__main__":
         sol[interior] = tmp
         return sol
 
-    print(f"Solve {n:,} PDE source problems in parallel with {n_cpu} workers using Quasi-Monte Carlo nodes...")
+    print(f"Solve {n:,} PDE source problems in parallel with {n_cpu} workers using \033[1mQuasi-Monte Carlo\033[0m nodes...")
     start = perf_counter()
-    resultsQMC = np.asarray(Parallel(n_jobs=n_cpu)(delayed(solveQMC)(i) for i in range(n)))
+    resultsQMC = np.asarray(Parallel(n_jobs=n_cpu, verbose=0)(delayed(solveQMC)(i) for i in range(n)))
     stop = perf_counter()
-    print(f"Solving took {stop-start:.2f} seconds.")
+    if stop-start > 60:
+        print(f"Solving took {(stop-start)/60:.2f} minutes.")
+    else:
+        print(f"Solving took {stop-start:.2f} seconds.")
 
     referenceQMC = resultsQMC.mean(axis=0)
 
     # Visualize the results
-    #plotPDE(nodes, element, reference)
-    approximationQMC = [resultsQMC[:i+1].mean(axis=0) for i in range(int(n/(2**3)))]
+    # plotPDE(nodes, element, referenceQMC)
+    approximationQMC = [resultsQMC[:2**i].mean(axis=0) for i in range(1, maxiter-5)]
 
-    plotPDE(nodes, element, referenceQMC)
+    plotERROR(referenceQMC, approximationQMC, maxiter)
 
-    plotERROR(referenceQMC, approximationQMC, n)
+    plt.show()
