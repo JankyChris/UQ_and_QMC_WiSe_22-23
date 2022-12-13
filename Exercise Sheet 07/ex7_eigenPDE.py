@@ -86,7 +86,7 @@ def plotERROR(reference, approximations, maxiter: int):
 
 if __name__ == "__main__":
     # use n == 2^maxiter as the "reference solution"
-    maxiter = 15;
+    maxiter = 18;
 
     # set stochastic dimension
     s = 100
