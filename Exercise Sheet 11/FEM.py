@@ -1,3 +1,11 @@
+"""
+@Author:    Christoph M. Jankowsky
+@Date:      2023-02-05
+
+Helper functions for Sheet 11 of the course 
+Uncertainty Quantification and Quasi-Monte Carlo at FU Berlin.
+"""
+
 import numpy as np
 import scipy.io
 from scipy import sparse

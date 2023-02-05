@@ -1,3 +1,11 @@
+"""
+@Author:    Christoph M. Jankowsky
+@Date:      2023-02-05
+
+My solutions to Sheet 11 - Exercise 3 of the course 
+Uncertainty Quantification and Quasi-Monte Carlo at FU Berlin.
+"""
+
 import time
 import numpy as np
 from scipy import sparse
@@ -8,7 +16,6 @@ import matplotlib.pyplot as plt
 from FEM import FEMdata, UpdateStiffness
 
 if __name__ == "__main__":
-    # Load FEM data
     mass, grad, nodes, element, interior, centers, ncoord, nelem = FEMdata(5)
 
     random_field_decay = 2.0
@@ -17,10 +24,10 @@ if __name__ == "__main__":
     deterministic = indices**(-random_field_decay) * np.sin(np.pi * indices * centers[:,0]) * np.sin(np.pi * indices * centers[:,1])
     a = lambda y: 2 + y @ deterministic
 
-    f = lambda x: x[:,0] # source term
+    f = lambda x: x[:,0]
     rhs = mass[interior,:] @ f(nodes)
 
-    R = 4
+    R = 16
     generating_vector = np.loadtxt('Exercise Sheet 11/data/offtheshelf2048.txt')
     z = generating_vector[:s]
 
@@ -38,7 +45,7 @@ if __name__ == "__main__":
     for n_qmc_nodes in N:
         results = []
     
-        # For each random shift, compute the QMC estimate using n cubature nodes
+        # For each random shift, compute the QMC estimate using (n_qmc_nodes) cubature nodes
         print(f"Solving {n_qmc_nodes} PDEs in parallel with {R} random shifts...")
         t = time.perf_counter()
         with Parallel(n_jobs=-1, verbose=0) as parallel:

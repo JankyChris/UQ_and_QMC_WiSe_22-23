@@ -1,3 +1,11 @@
+"""
+@Author:    Christoph M. Jankowsky
+@Date:      2023-02-05
+
+My solutions to Sheet 11 - Exercise 2 of the course 
+Uncertainty Quantification and Quasi-Monte Carlo at FU Berlin.
+"""
+
 import time
 import numpy as np
 from scipy import sparse
@@ -8,10 +16,9 @@ import matplotlib.pyplot as plt
 from FEM import FEMdata, UpdateStiffness
 
 if __name__ == "__main__":
-    # Load FEM data
     mass, grad, nodes, element, interior, centers, ncoord, nelem = FEMdata(5)
     random_field_decay = 2.0
-    f = lambda x: x[:,0] # source term
+    f = lambda x: x[:,0]
     rhs = mass[interior,:] @ f(nodes)
     n_qmc_nodes = 2**15
     generating_vector = np.loadtxt('Exercise Sheet 11/data/offtheshelf2048.txt')
@@ -23,7 +30,7 @@ if __name__ == "__main__":
             qmcnode = np.mod(i*z/n,1)-1/2
             A = UpdateStiffness(grad,a(qmcnode))
             sol = spsolve(A[np.ix_(interior,interior)],rhs)
-            return ones @ mass[np.ix_(interior,interior)] @ sol # quantity of interest
+            return ones @ mass[np.ix_(interior,interior)] @ sol
 
     for s in S:
         indices = np.arange(1,s+1).reshape((s,1))

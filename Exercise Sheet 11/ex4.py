@@ -1,3 +1,11 @@
+"""
+@Author:    Christoph M. Jankowsky
+@Date:      2023-02-05
+
+My solutions to Sheet 11 - Exercise 4 of the course 
+Uncertainty Quantification and Quasi-Monte Carlo at FU Berlin.
+"""
+
 import time
 import numpy as np
 from scipy import sparse
@@ -21,7 +29,7 @@ if __name__ == "__main__":
     f = lambda x: x[:,0] # source term
     rhs = mass[interior,:] @ f(nodes)
 
-    R = 4
+    R = 16
     generating_vector = np.loadtxt('Exercise Sheet 11/data/offtheshelf2048.txt')
     z = generating_vector[:s]
 
@@ -51,7 +59,7 @@ if __name__ == "__main__":
             
         # Take the average of the R QMC approximations as the final estimate
         qmcavg = np.mean(results)
-        rmserror = np.linalg.norm(qmcavg-results)/np.sqrt(R*(R-1)) # R.M.S. error estimate
+        rmserror = np.linalg.norm(qmcavg-results)/np.sqrt(R*(R-1))
         
         errors.append(rmserror)
 
