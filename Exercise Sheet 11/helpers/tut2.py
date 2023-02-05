@@ -8,7 +8,7 @@ from scipy.sparse.linalg import spsolve
 from joblib import Parallel, delayed
 
 def FEMdata(level):
-    mat = scipy.io.loadmat('FEM' + str(level) + '.mat')
+    mat = scipy.io.loadmat('Exercise Sheet 11/data/FEM' + str(level) + '.mat')
     grad = mat['grad']
     mass = mat['mass']
     nodes = mat['nodes']
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     rhs = mass[interior,:] @ f(nodes)
 
     # Import the generating vector
-    gen = np.loadtxt('offtheshelf2048.txt')
+    gen = np.loadtxt('Exercise Sheet 11/data/offtheshelf2048.txt')
     z = gen[:s] # truncate generating vector to s terms
     n = 2**15 # fix number of QMC nodes
     ones = np.ones(interior.shape[0])
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         return ones @ mass[np.ix_(interior,interior)] @ sol # quantity of interest
     
     # Solve 2^15 PDEs in parallel
-    results = Parallel(n_jobs=-1)(delayed(solve)(i,n) for i in range(n))
+    results = Parallel(n_jobs=-1, verbose=5)(delayed(solve)(i,n) for i in range(n))
     
     # Compute the QMC average
     reference = np.mean(results)

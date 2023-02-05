@@ -5,7 +5,7 @@ import numpy as np
 import scipy.io
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
-from scipy.stats import norm
+from scipy.stats import norm # need inverse CDF for normal distribution
 from joblib import Parallel, delayed
 
 def FEMdata(level):

@@ -8,7 +8,7 @@ from scipy.sparse.linalg import spsolve
 from joblib import Parallel, delayed
 
 def FEMdata(level):
-    mat = scipy.io.loadmat('FEM' + str(level) + '.mat')
+    mat = scipy.io.loadmat('Exercise Sheet 11/data/FEM' + str(level) + '.mat')
     grad = mat['grad']
     mass = mat['mass']
     nodes = mat['nodes']
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     rhs = mass[interior,:] @ f(nodes)
 
     # Import the generating vector
-    gen = np.loadtxt('offtheshelf2048.txt')
+    gen = np.loadtxt('Exercise Sheet 11/data/offtheshelf2048.txt')
     z = gen[:s]
     n = 2**15 # number of QMC nodes
     R = 4 # number of random shifts
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     results = []
     
     # For each random shift, compute the QMC estimate using n cubature nodes
-    with Parallel(n_jobs=-1) as parallel:
+    with Parallel(n_jobs=-1, verbose=5) as parallel:
         for r in range(R):
             shift = np.random.uniform(0,1,s)
             tmp = parallel(delayed(solve)(i,shift,n) for i in range(n))

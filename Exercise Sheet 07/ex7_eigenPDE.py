@@ -86,7 +86,7 @@ def plotERROR(reference, approximations, maxiter: int):
 
 if __name__ == "__main__":
     # use n == 2^maxiter as the "reference solution"
-    maxiter = 18;
+    maxiter = 10;
 
     # set stochastic dimension
     s = 100
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     ## Eigenvalue problem using Monte Carlo method
 
-    n_cpu = 16
+    n_cpu = -1
     
     def solveMC(i):
         mcnode = np.random.uniform(-1/2,1/2,s)

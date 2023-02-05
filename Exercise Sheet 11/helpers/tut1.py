@@ -7,7 +7,7 @@ from scipy import sparse, interpolate
 from scipy.sparse.linalg import spsolve
 
 def FEMdata(level):
-    mat = scipy.io.loadmat('FEM' + str(level) + '.mat')
+    mat = scipy.io.loadmat('Exercise Sheet 11/data/FEM' + str(level) + '.mat')
     grad = mat['grad']
     mass = mat['mass']
     nodes = mat['nodes']
