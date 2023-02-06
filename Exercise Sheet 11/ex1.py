@@ -36,8 +36,10 @@ if __name__ == "__main__":
     for level, error in enumerate(errors):
         print(f"Error at level {level+1}: \t{error}.")
 
-    plt.plot(range(1,5), errors, label="Finite Element Errors", marker="+", ls="", color="purple")
-    m,b = np.polyfit(range(1,5), errors, 1)
-    plt.plot(range(1,5), m*range(1,5)+b, label=f"m = {m}", linestyle="dashed", color="orange")
+    x = [2**(k) for k in range(1,5)]
+
+    plt.loglog(x, errors, label="Finite Element Errors", marker="+", ls="", color="purple")
+    m,b = np.polyfit(np.log10(x), np.log10(errors), 1)
+    plt.loglog(x, x**m * 10**b, label=f"m = {m}", linestyle="dashed", color="orange")
     plt.legend()
     plt.show()
